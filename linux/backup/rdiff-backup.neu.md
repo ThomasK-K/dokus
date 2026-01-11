@@ -1,167 +1,127 @@
-# rdiff-backup Kommando-Referenz
-# ==============================
+# rdiff-backup Kommando-Referenz (Version 2.2.6 - Neue API)
+# =========================================================
 
-# Grundlegende Backup-Befehle
-# ---------------------------
+# Für deinen spezifischen Fehler - Korrekte Befehle:
 
-# Lokales Backup erstellen
-rdiff-backup /quellverzeichnis /zielverzeichnis
+# 1. Repository mit neuer API initialisieren/überprüfen
+rdiff-backup --new list increments /media/tkk/backup_daten
 
-# Remote-Backup über SSH
-rdiff-backup /lokales/verzeichnis benutzer@hostname:/remote/backup
-rdiff-backup benutzer@quellhost:/remote/quelle /lokales/backup
-rdiff-backup benutzer1@quellhost:/remote/quelle benutzer2@zielhost:/remote/backup
+# 2. Mit API-Version für Kompatibilität
+rdiff-backup --api-version 201 list increments /media/tkk/backup_daten
 
-# Backup mit verschiedenen Verbose-Leveln
-rdiff-backup -v 0 /quelle /ziel        # Still mode
-rdiff-backup -v 1 /quelle /ziel        # Fehler anzeigen
-rdiff-backup -v 2 /quelle /ziel        # Warnungen anzeigen
-rdiff-backup -v 3 /quelle /ziel        # Info anzeigen
-rdiff-backup -v 5 /quelle /ziel        # Debug modus
-rdiff-backup -v 8 /quelle /ziel        # Sehr ausführlich
-rdiff-backup -v 9 /quelle /ziel        # Extrem ausführlich
+# Grundlegende neue Syntax
+# ------------------------
 
-# Backup mit Statistiken
-rdiff-backup --print-statistics /quelle /ziel
+# Backup erstellen (neue Syntax)
+rdiff-backup --new backup /quellverzeichnis /zielverzeichnis
 
-# Backup-Verwaltung und Wiederherstellung
-# ---------------------------------------
+# Increments auflisten (korrekt für 2.2.6)
+rdiff-backup --new list increments /backup-ziel
+rdiff-backup --api-version 201 list increments /backup-ziel
 
-# Verfügbare Increments auflisten
-rdiff-backup --list-increments /backup-verzeichnis
-rdiff-backup --list-increment-sizes /backup-verzeichnis
+# Wiederherstellung (neue Syntax)
+rdiff-backup --new restore --at 1D /backup-ziel /wiederherstellungs-ziel
+rdiff-backup --api-version 201 restore --at 1D /backup-ziel /wiederherstellungs-ziel
 
-# Zu bestimmten Zeitpunkt wiederherstellen
-rdiff-backup -r now /backup /wiederherstellung
-rdiff-backup -r 1D /backup /wiederherstellung        # 1 Tag alt
-rdiff-backup -r 1B /backup /wiederherstellung        # 1 Backup alt
-rdiff-backup -r 2W /backup /wiederherstellung        # 2 Wochen alt
-rdord-backup -r 1M /backup /wiederherstellung        # 1 Monat alt
-rdiff-backup -r 2024-01-15T10:30:00 /backup /wiederherstellung
+# Backup bereinigen
+rdiff-backup --new delete --older-than 30D /backup-ziel
+rdiff-backup --api-version 201 delete --older-than 30D /backup-ziel
 
-# Bestimmte Datei/Directory wiederherstellen
-rdiff-backup -r 1D /backup/pfad/zur/datei /ziel/pfad
-
-# Backup-Bereinigung
-# ------------------
-
-# Alte Backups entfernen
-rdiff-backup --remove-older-than 7D /backup          # Älter als 7 Tage
-rdiff-backup --remove-older-than 1M /backup          # Älter als 1 Monat
-rdiff-backup --remove-older-than 6M /backup          # Älter als 6 Monate
-rdiff-backup --remove-older-than 1Y /backup          # Älter als 1 Jahr
-
-# Force entfernen
-rdiff-backup --force --remove-older-than 30D /backup
-
-# Ausschluss-Optionen
-# -------------------
-
-# Einzelne Ausschlüsse
-rdiff-backup --exclude "*.tmp" /quelle /ziel
-rdiff-backup --exclude "/home/*/Downloads" /quelle /ziel
-rdiff-backup --exclude "**/cache" /quelle /ziel
-
-# Mehrfache Ausschlüsse
-rdiff-backup --exclude "*.log" --exclude "*.tmp" --exclude "/tmp" /quelle /ziel
-
-# Ausschluss-Liste aus Datei
-rdiff-backup --exclude-filelist /pfad/ausschlussliste.txt /quelle /ziel
-
-# Include bestimmter Pfade (trotz Ausschluss)
-rdiff-backup --include "/wichtig" --exclude "**" /quelle /ziel
-
-# Glob-Muster für Ausschlüsse
-rdiff-backup --exclude-globbing-filelist /pfad/globbing-list.txt /quelle /ziel
-
-# Erweiterte Optionen
-# -------------------
-
-# Maximale Dateigröße setzen
-rdiff-backup --max-file-size 100M /quelle /ziel
-
-# SSH-Optionen
-rdiff-backup --remote-schema "ssh -C -p 2222 %s rdiff-backup --server" /quelle user@host:/backup
-
-# Bandbreite begrenzen
-rdiff-backup --remote-schema "ssh -o ConnectTimeout=60 %s rdiff-backup --server" /quelle /ziel
-
-# Backup testen ohne zu schreiben
-rdiff-backup --dry-run /quelle /ziel
-
-# Force Operationen
-rdiff-backup --force /quelle /ziel
-
-# Create full verbindung (für initiale Backups)
-rdiff-backup --create-full-path /quelle /ziel
-
-# Vergleich und Überprüfung
-# -------------------------
-
-# Unterschiede zwischen Quelle und Backup anzeigen
-rdiff-backup --compare /quelle /backup
-
-# Vergleich mit bestimmten Increment
-rdiff-backup --compare-at-time 1D /quelle /backup
-
-# Metadaten-Operationen
-# ---------------------
-
-# ACLs erhalten
-rdiff-backup --preserve-numerical-ids /quelle /ziel
-
-# Besitzer/Gruppen erhalten
-rdiff-backup --no-file-statistics /quelle /ziel
-
-# Server-Kommandos
-# ----------------
-
-# Server-Modus starten
-rdiff-backup --server
-
-# Test-Kommandos
-# --------------
-
-# Version anzeigen
-rdiff-backup --version
-
-# Hilfe anzeigen
-rdiff-backup --help
-
-# Konfigurationsdatei verwenden
-rdiff-backup --parsable-output /quelle /ziel
-
-# Beispiel für komplexes Backup-Setup
+# Komplette Befehlsreferenz für 2.2.6
 # ------------------------------------
 
-# Komplexes Backup mit Ausschlüssen und Limits
-rdiff-backup \
-  --exclude "**/tmp" \
-  --exclude "**/cache" \
-  --exclude "*.log" \
+# Hilfe anzeigen (neue API)
+rdiff-backup --new --help
+rdiff-backup --api-version 201 --help
+
+# Backup Operationen
+rdiff-backup --new backup /quelle /ziel
+rdiff-backup --new backup --exclude "*.tmp" /quelle /ziel
+rdiff-backup --api-version 201 backup /quelle /ziel
+
+# Increments verwalten
+rdiff-backup --new list increments /backup-ziel
+rdiff-backup --new list increments --format JSON /backup-ziel
+rdiff-backup --api-version 201 list increments /backup-ziel
+
+# Wiederherstellung
+rdiff-backup --new restore --at now /backup-ziel /wiederherstellungs-ziel
+rdiff-backup --new restore --at 1D /backup-ziel /wiederherstellungs-ziel
+rdiff-backup --new restore --at 2024-01-15 /backup-ziel /wiederherstellungs-ziel
+rdiff-backup --api-version 201 restore --at 1D /backup-ziel /wiederherstellungs-ziel
+
+# Bestimmte Datei wiederherstellen
+rdiff-backup --new restore --at 2D /backup-ziel/pfad/datei /ziel-pfad
+
+# Backup löschen/bereinigen
+rdiff-backup --new delete --older-than 7D /backup-ziel
+rdiff-backup --new delete --older-than 1M /backup-ziel
+rdiff-backup --new delete --force --older-than 30D /backup-ziel
+rdiff-backup --api-version 201 delete --older-than 30D /backup-ziel
+
+# Repository Informationen
+rdiff-backup --new info /backup-ziel
+rdiff-backup --new info --statistics /backup-ziel
+rdiff-backup --api-version 201 info /backup-ziel
+
+# Vergleich
+rdiff-backup --new compare /quelle /backup-ziel
+rdiff-backup --new compare --at 1D /quelle /backup-ziel
+
+# Remote Backup (neue Syntax)
+rdiff-backup --new backup /lokale/quelle user@remotehost::/remote/backup
+rdiff-backup --api-version 201 backup /lokale/quelle user@remotehost::/remote/backup
+
+# Für deinen speziellen Fall - Lösungsansätze:
+# --------------------------------------------
+
+# 1. Prüfen ob Repository existiert
+rdiff-backup --new info /media/tkk/backup_daten
+
+# 2. Falls kein Repository existiert, erstelle eines:
+rdiff-backup --new backup /deine/daten /media/tkk/backup_daten
+
+# 3. Oder mit API-Version für Kompatibilität
+rdiff-backup --api-version 201 backup /deine/daten /media/tkk/backup_daten
+
+# 4. Altes Repository migrieren (falls vorhanden)
+rdiff-backup --new migrate /media/tkk/backup_daten
+
+# Praktische Beispiele für 2.2.6
+# ------------------------------
+
+# Backup mit Ausschlüssen
+rdiff-backup --new backup \
   --exclude "*.tmp" \
-  --max-file-size 1G \
-  --remote-schema "ssh -C -c aes256-ctr %s rdiff-backup --server" \
-  -v 3 \
-  --print-statistics \
-  /wichtige/daten \
-  backup-user@backup-server:/backups/hauptserver
+  --exclude "**/cache/" \
+  /home/user \
+  /media/tkk/backup_daten
 
-# Cron-Job für automatische Backups
-# 0 2 * * * rdiff-backup --remove-older-than 30D /backup/hauptserver
-# 0 3 * * * rdiff-backup --exclude-filelist /etc/backup-excludes.txt /daten backup-user@server:/backups
+# Increments anzeigen (dein spezifischer Fall)
+rdiff-backup --new list increments /media/tkk/backup_daten
+rdiff-backup --api-version 201 list increments /media/tkk/backup_daten
 
-# Beispiel für Wiederherstellungsszenario
-# ----------------------------------------
+# Automatisierung mit Cron (neue Syntax)
+# 0 2 * * * rdiff-backup --api-version 201 backup /important /media/tkk/backup_daten
+# 0 3 * * 0 rdiff-backup --api-version 201 delete --older-than 30D /media/tkk/backup_daten
 
-# 1. Verfügbare Backups anzeigen
-rdiff-backup --list-increments /backups/hauptserver
+# Fehlerbehebung für deinen Fall:
+# -------------------------------
 
-# 2. Komplettes System vom gestrigen Stand wiederherstellen
-rdiff-backup -r 1D /backups/hauptserver /wiederherstellung/bereich
+# 1. Repository-Struktur prüfen
+ls -la /media/tkk/backup_daten/
 
-# 3. Nur bestimmten Ordner wiederherstellen
-rdiff-backup -r 2D /backups/hauptserver/home/user/dokumente /tmp/wiederhergestellt
+# 2. Falls rdiff-backup-data Ordner existiert, ist es ein altes Repository
+# 3. Dann migrieren oder mit API-Version arbeiten
 
-# 4. Alte Backups bereinigen
-rdiff-backup --remove-older-than 90D /backups/hauptserver
+# Migration von altem Repository
+rdiff-backup --new migrate /media/tkk/backup_daten
+
+# Oder mit Kompatibilitätsmodus arbeiten
+rdiff-backup --api-version 201 list increments /media/tkk/backup_daten
+
+# Wichtig in Version 2.2.6:
+# - Alte Syntax ist deprecated
+# --new für neue API verwenden
+# --api-version für Kompatibilität
+# Repository muss mit neuer API erstellt werden
